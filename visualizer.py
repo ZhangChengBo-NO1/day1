@@ -9,14 +9,53 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg
+import matplotlib.font_manager as fm
 import numpy as np
 from typing import List, Dict, Any, Optional, Tuple, Union
 from datetime import datetime
 import os
+import sys
+import warnings
 
 from config import VISUALIZATION, EXPORT_CONFIG, REPORT_CONFIG, CATEGORIES
 from models import MonthlyReport, AnnualReport, Transaction
 from utils import FormatUtils, DateUtils
+
+
+def setup_chinese_font():
+    """设置中文字体支持"""
+    # 忽略字体警告
+    warnings.filterwarnings('ignore', category=UserWarning)
+    
+    # 根据操作系统设置中文字体
+    if sys.platform == 'win32':
+        # Windows 系统字体
+        chinese_fonts = ['SimHei', 'Microsoft YaHei', 'SimSun', 'NSimSun']
+    elif sys.platform == 'darwin':
+        # macOS 系统字体
+        chinese_fonts = ['Arial Unicode MS', 'Heiti TC', 'PingFang TC']
+    else:
+        # Linux 系统字体
+        chinese_fonts = ['WenQuanYi Micro Hei', 'Noto Sans CJK SC', 'Source Han Sans CN']
+    
+    # 尝试设置中文字体
+    font_set = False
+    for font_name in chinese_fonts:
+        try:
+            plt.rcParams['font.sans-serif'] = [font_name] + plt.rcParams['font.sans-serif']
+            plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+            font_set = True
+            break
+        except:
+            continue
+    
+    if not font_set:
+        # 如果找不到中文字体，使用默认字体并关闭警告
+        plt.rcParams['font.family'] = 'sans-serif'
+
+
+# 初始化时设置字体
+setup_chinese_font()
 
 
 class FinanceVisualizer:
